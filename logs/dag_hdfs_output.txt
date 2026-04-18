@@ -1,0 +1,124 @@
+26/04/18 13:08:15 INFO SparkContext: Running Spark version 3.5.1
+26/04/18 13:08:15 INFO SparkContext: OS info Linux, 5.15.167.4-microsoft-standard-WSL2, amd64
+26/04/18 13:08:15 INFO SparkContext: Java version 11.0.22
+26/04/18 13:08:15 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+26/04/18 13:08:16 INFO ResourceUtils: ==============================================================
+26/04/18 13:08:16 INFO ResourceUtils: No custom resources configured for spark.driver.
+26/04/18 13:08:16 INFO ResourceUtils: ==============================================================
+26/04/18 13:08:16 INFO SparkContext: Submitted application: DAGInspectionHDFS
+26/04/18 13:08:16 INFO ResourceProfile: Default ResourceProfile created, executor resources: Map(cores -> name: cores, amount: 1, script: , vendor: , memory -> name: memory, amount: 1024, script: , vendor: , offHeap -> name: offHeap, amount: 0, script: , vendor: ), task resources: Map(cpus -> name: cpus, amount: 1.0)
+26/04/18 13:08:16 INFO ResourceProfile: Limiting resource is cpu
+26/04/18 13:08:16 INFO ResourceProfileManager: Added ResourceProfile id: 0
+26/04/18 13:08:16 INFO SecurityManager: Changing view acls to: spark
+26/04/18 13:08:16 INFO SecurityManager: Changing modify acls to: spark
+26/04/18 13:08:16 INFO SecurityManager: Changing view acls groups to: 
+26/04/18 13:08:16 INFO SecurityManager: Changing modify acls groups to: 
+26/04/18 13:08:16 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: spark; groups with view permissions: EMPTY; users with modify permissions: spark; groups with modify permissions: EMPTY
+26/04/18 13:08:16 INFO Utils: Successfully started service 'sparkDriver' on port 37259.
+26/04/18 13:08:16 INFO SparkEnv: Registering MapOutputTracker
+26/04/18 13:08:16 INFO SparkEnv: Registering BlockManagerMaster
+26/04/18 13:08:16 INFO BlockManagerMasterEndpoint: Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+26/04/18 13:08:16 INFO BlockManagerMasterEndpoint: BlockManagerMasterEndpoint up
+26/04/18 13:08:16 INFO SparkEnv: Registering BlockManagerMasterHeartbeat
+26/04/18 13:08:16 INFO DiskBlockManager: Created local directory at /tmp/blockmgr-04459839-4df6-46b8-80d3-3b63f228f6a9
+26/04/18 13:08:16 INFO MemoryStore: MemoryStore started with capacity 434.4 MiB
+26/04/18 13:08:16 INFO SparkEnv: Registering OutputCommitCoordinator
+26/04/18 13:08:16 INFO JettyUtils: Start Jetty 0.0.0.0:4040 for SparkUI
+26/04/18 13:08:16 INFO Utils: Successfully started service 'SparkUI' on port 4040.
+26/04/18 13:08:16 INFO Executor: Starting executor ID driver on host da0a3df8c749
+26/04/18 13:08:16 INFO Executor: OS info Linux, 5.15.167.4-microsoft-standard-WSL2, amd64
+26/04/18 13:08:16 INFO Executor: Java version 11.0.22
+26/04/18 13:08:16 INFO Executor: Starting executor with user classpath (userClassPathFirst = false): ''
+26/04/18 13:08:16 INFO Executor: Created or updated repl class loader org.apache.spark.util.MutableURLClassLoader@31229a56 for default.
+26/04/18 13:08:16 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 43111.
+26/04/18 13:08:16 INFO NettyBlockTransferService: Server created on da0a3df8c749:43111
+26/04/18 13:08:16 INFO BlockManager: Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+26/04/18 13:08:17 INFO BlockManagerMaster: Registering BlockManager BlockManagerId(driver, da0a3df8c749, 43111, None)
+26/04/18 13:08:17 INFO BlockManagerMasterEndpoint: Registering block manager da0a3df8c749:43111 with 434.4 MiB RAM, BlockManagerId(driver, da0a3df8c749, 43111, None)
+26/04/18 13:08:17 INFO BlockManagerMaster: Registered BlockManager BlockManagerId(driver, da0a3df8c749, 43111, None)
+26/04/18 13:08:17 INFO BlockManager: Initialized BlockManager: BlockManagerId(driver, da0a3df8c749, 43111, None)
+=== Spark Runtime ===
+Spark version: 3.5.1
+
+=== Filesystem Config ===
+fs.defaultFS: hdfs://namenode:8020
+fs.file.impl: None
+fs.hdfs.impl: None
+
+=== Read from HDFS ===
+Input path: hdfs://namenode:8020/data/raw/financial_inclusion_data.csv
+
+=== Logical/Physical Plan (DAG-style plan) ===
+== Parsed Logical Plan ==
+'Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#432, income#281, occupation#433, savings_ratio#323, spending_ratio#365, payment_delay_days#407, loan_repaid#28, digital_activity_score#446, financial_discipline_score#460, CASE WHEN ('monthly_upi_transactions < 8) THEN 1 ELSE 0 END AS is_underbanked#475]
++- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#432, income#281, occupation#433, savings_ratio#323, spending_ratio#365, payment_delay_days#407, loan_repaid#28, digital_activity_score#446, ((bill_payment_timeliness#155 + savings_ratio#323) / 2.0) AS financial_discipline_score#460]
+   +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#432, income#281, occupation#433, savings_ratio#323, spending_ratio#365, payment_delay_days#407, loan_repaid#28, ((cast(monthly_upi_transactions#71 as double) * avg_transaction_amount#113) / 1000.0) AS digital_activity_score#446]
+      +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, coalesce(location_type#22, cast(rural as string)) AS location_type#432, income#281, coalesce(occupation#24, cast(gig_worker as string)) AS occupation#433, savings_ratio#323, spending_ratio#365, payment_delay_days#407, loan_repaid#28]
+         +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#22, income#281, occupation#24, savings_ratio#323, spending_ratio#365, coalesce(payment_delay_days#27, cast(7.0 as int)) AS payment_delay_days#407, loan_repaid#28]
+            +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#22, income#281, occupation#24, savings_ratio#323, coalesce(nanvl(spending_ratio#26, cast(null as double)), cast(0.677 as double)) AS spending_ratio#365, payment_delay_days#27, loan_repaid#28]
+               +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#22, income#281, occupation#24, coalesce(nanvl(savings_ratio#25, cast(null as double)), cast(0.221 as double)) AS savings_ratio#323, spending_ratio#26, payment_delay_days#27, loan_repaid#28]
+                  +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#22, coalesce(nanvl(income#23, cast(null as double)), cast(41564.79 as double)) AS income#281, occupation#24, savings_ratio#25, spending_ratio#26, payment_delay_days#27, loan_repaid#28]
+                     +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, coalesce(age#21, cast(39.0 as int)) AS age#239, location_type#22, income#23, occupation#24, savings_ratio#25, spending_ratio#26, payment_delay_days#27, loan_repaid#28]
+                        +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, coalesce(mobile_recharge_frequency#20, cast(8.0 as int)) AS mobile_recharge_frequency#197, age#21, location_type#22, income#23, occupation#24, savings_ratio#25, spending_ratio#26, payment_delay_days#27, loan_repaid#28]
+                           +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, coalesce(nanvl(bill_payment_timeliness#19, cast(null as double)), cast(0.818 as double)) AS bill_payment_timeliness#155, mobile_recharge_frequency#20, age#21, location_type#22, income#23, occupation#24, savings_ratio#25, spending_ratio#26, payment_delay_days#27, loan_repaid#28]
+                              +- Project [monthly_upi_transactions#71, coalesce(nanvl(avg_transaction_amount#18, cast(null as double)), cast(832.75 as double)) AS avg_transaction_amount#113, bill_payment_timeliness#19, mobile_recharge_frequency#20, age#21, location_type#22, income#23, occupation#24, savings_ratio#25, spending_ratio#26, payment_delay_days#27, loan_repaid#28]
+                                 +- Project [coalesce(monthly_upi_transactions#17, cast(19.0 as int)) AS monthly_upi_transactions#71, avg_transaction_amount#18, bill_payment_timeliness#19, mobile_recharge_frequency#20, age#21, location_type#22, income#23, occupation#24, savings_ratio#25, spending_ratio#26, payment_delay_days#27, loan_repaid#28]
+                                    +- Relation [monthly_upi_transactions#17,avg_transaction_amount#18,bill_payment_timeliness#19,mobile_recharge_frequency#20,age#21,location_type#22,income#23,occupation#24,savings_ratio#25,spending_ratio#26,payment_delay_days#27,loan_repaid#28] csv
+
+== Analyzed Logical Plan ==
+monthly_upi_transactions: int, avg_transaction_amount: double, bill_payment_timeliness: double, mobile_recharge_frequency: int, age: int, location_type: string, income: double, occupation: string, savings_ratio: double, spending_ratio: double, payment_delay_days: int, loan_repaid: int, digital_activity_score: double, financial_discipline_score: double, is_underbanked: int
+Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#432, income#281, occupation#433, savings_ratio#323, spending_ratio#365, payment_delay_days#407, loan_repaid#28, digital_activity_score#446, financial_discipline_score#460, CASE WHEN (monthly_upi_transactions#71 < 8) THEN 1 ELSE 0 END AS is_underbanked#475]
++- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#432, income#281, occupation#433, savings_ratio#323, spending_ratio#365, payment_delay_days#407, loan_repaid#28, digital_activity_score#446, ((bill_payment_timeliness#155 + savings_ratio#323) / 2.0) AS financial_discipline_score#460]
+   +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#432, income#281, occupation#433, savings_ratio#323, spending_ratio#365, payment_delay_days#407, loan_repaid#28, ((cast(monthly_upi_transactions#71 as double) * avg_transaction_amount#113) / 1000.0) AS digital_activity_score#446]
+      +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, coalesce(location_type#22, cast(rural as string)) AS location_type#432, income#281, coalesce(occupation#24, cast(gig_worker as string)) AS occupation#433, savings_ratio#323, spending_ratio#365, payment_delay_days#407, loan_repaid#28]
+         +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#22, income#281, occupation#24, savings_ratio#323, spending_ratio#365, coalesce(payment_delay_days#27, cast(7.0 as int)) AS payment_delay_days#407, loan_repaid#28]
+            +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#22, income#281, occupation#24, savings_ratio#323, coalesce(nanvl(spending_ratio#26, cast(null as double)), cast(0.677 as double)) AS spending_ratio#365, payment_delay_days#27, loan_repaid#28]
+               +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#22, income#281, occupation#24, coalesce(nanvl(savings_ratio#25, cast(null as double)), cast(0.221 as double)) AS savings_ratio#323, spending_ratio#26, payment_delay_days#27, loan_repaid#28]
+                  +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#22, coalesce(nanvl(income#23, cast(null as double)), cast(41564.79 as double)) AS income#281, occupation#24, savings_ratio#25, spending_ratio#26, payment_delay_days#27, loan_repaid#28]
+                     +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, coalesce(age#21, cast(39.0 as int)) AS age#239, location_type#22, income#23, occupation#24, savings_ratio#25, spending_ratio#26, payment_delay_days#27, loan_repaid#28]
+                        +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, coalesce(mobile_recharge_frequency#20, cast(8.0 as int)) AS mobile_recharge_frequency#197, age#21, location_type#22, income#23, occupation#24, savings_ratio#25, spending_ratio#26, payment_delay_days#27, loan_repaid#28]
+                           +- Project [monthly_upi_transactions#71, avg_transaction_amount#113, coalesce(nanvl(bill_payment_timeliness#19, cast(null as double)), cast(0.818 as double)) AS bill_payment_timeliness#155, mobile_recharge_frequency#20, age#21, location_type#22, income#23, occupation#24, savings_ratio#25, spending_ratio#26, payment_delay_days#27, loan_repaid#28]
+                              +- Project [monthly_upi_transactions#71, coalesce(nanvl(avg_transaction_amount#18, cast(null as double)), cast(832.75 as double)) AS avg_transaction_amount#113, bill_payment_timeliness#19, mobile_recharge_frequency#20, age#21, location_type#22, income#23, occupation#24, savings_ratio#25, spending_ratio#26, payment_delay_days#27, loan_repaid#28]
+                                 +- Project [coalesce(monthly_upi_transactions#17, cast(19.0 as int)) AS monthly_upi_transactions#71, avg_transaction_amount#18, bill_payment_timeliness#19, mobile_recharge_frequency#20, age#21, location_type#22, income#23, occupation#24, savings_ratio#25, spending_ratio#26, payment_delay_days#27, loan_repaid#28]
+                                    +- Relation [monthly_upi_transactions#17,avg_transaction_amount#18,bill_payment_timeliness#19,mobile_recharge_frequency#20,age#21,location_type#22,income#23,occupation#24,savings_ratio#25,spending_ratio#26,payment_delay_days#27,loan_repaid#28] csv
+
+== Optimized Logical Plan ==
+Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#432, income#281, occupation#433, savings_ratio#323, spending_ratio#365, payment_delay_days#407, loan_repaid#28, ((cast(monthly_upi_transactions#71 as double) * avg_transaction_amount#113) / 1000.0) AS digital_activity_score#446, ((bill_payment_timeliness#155 + savings_ratio#323) / 2.0) AS financial_discipline_score#460, CASE WHEN (monthly_upi_transactions#71 < 8) THEN 1 ELSE 0 END AS is_underbanked#475]
++- Project [coalesce(monthly_upi_transactions#17, 19) AS monthly_upi_transactions#71, coalesce(nanvl(avg_transaction_amount#18, null), 832.75) AS avg_transaction_amount#113, coalesce(nanvl(bill_payment_timeliness#19, null), 0.818) AS bill_payment_timeliness#155, coalesce(mobile_recharge_frequency#20, 8) AS mobile_recharge_frequency#197, coalesce(age#21, 39) AS age#239, coalesce(location_type#22, rural) AS location_type#432, coalesce(nanvl(income#23, null), 41564.79) AS income#281, coalesce(occupation#24, gig_worker) AS occupation#433, coalesce(nanvl(savings_ratio#25, null), 0.221) AS savings_ratio#323, coalesce(nanvl(spending_ratio#26, null), 0.677) AS spending_ratio#365, coalesce(payment_delay_days#27, 7) AS payment_delay_days#407, loan_repaid#28]
+   +- Relation [monthly_upi_transactions#17,avg_transaction_amount#18,bill_payment_timeliness#19,mobile_recharge_frequency#20,age#21,location_type#22,income#23,occupation#24,savings_ratio#25,spending_ratio#26,payment_delay_days#27,loan_repaid#28] csv
+
+== Physical Plan ==
+*(1) Project [monthly_upi_transactions#71, avg_transaction_amount#113, bill_payment_timeliness#155, mobile_recharge_frequency#197, age#239, location_type#432, income#281, occupation#433, savings_ratio#323, spending_ratio#365, payment_delay_days#407, loan_repaid#28, ((cast(monthly_upi_transactions#71 as double) * avg_transaction_amount#113) / 1000.0) AS digital_activity_score#446, ((bill_payment_timeliness#155 + savings_ratio#323) / 2.0) AS financial_discipline_score#460, CASE WHEN (monthly_upi_transactions#71 < 8) THEN 1 ELSE 0 END AS is_underbanked#475]
++- *(1) Project [coalesce(monthly_upi_transactions#17, 19) AS monthly_upi_transactions#71, coalesce(nanvl(avg_transaction_amount#18, null), 832.75) AS avg_transaction_amount#113, coalesce(nanvl(bill_payment_timeliness#19, null), 0.818) AS bill_payment_timeliness#155, coalesce(mobile_recharge_frequency#20, 8) AS mobile_recharge_frequency#197, coalesce(age#21, 39) AS age#239, coalesce(location_type#22, rural) AS location_type#432, coalesce(nanvl(income#23, null), 41564.79) AS income#281, coalesce(occupation#24, gig_worker) AS occupation#433, coalesce(nanvl(savings_ratio#25, null), 0.221) AS savings_ratio#323, coalesce(nanvl(spending_ratio#26, null), 0.677) AS spending_ratio#365, coalesce(payment_delay_days#27, 7) AS payment_delay_days#407, loan_repaid#28]
+   +- FileScan csv [monthly_upi_transactions#17,avg_transaction_amount#18,bill_payment_timeliness#19,mobile_recharge_frequency#20,age#21,location_type#22,income#23,occupation#24,savings_ratio#25,spending_ratio#26,payment_delay_days#27,loan_repaid#28] Batched: false, DataFilters: [], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://namenode:8020/data/raw/financial_inclusion_data.csv], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<monthly_upi_transactions:int,avg_transaction_amount:double,bill_payment_timeliness:double,...
+
+
+=== RDD Lineage (toDebugString DAG) ===
+(1) MapPartitionsRDD[73] at javaToPython at <unknown>:0 []
+ |  MapPartitionsRDD[72] at javaToPython at <unknown>:0 []
+ |  SQLExecutionRDD[71] at javaToPython at <unknown>:0 []
+ |  MapPartitionsRDD[70] at javaToPython at <unknown>:0 []
+ |  MapPartitionsRDD[69] at javaToPython at <unknown>:0 []
+ |  FileScanRDD[68] at javaToPython at <unknown>:0 []
+
+=== Materialization Output ===
+Row count: 5000
++------------------------+--------+----------------------+--------------+
+|monthly_upi_transactions|income  |digital_activity_score|is_underbanked|
++------------------------+--------+----------------------+--------------+
+|21                      |28192.45|4.81278               |0             |
+|13                      |36290.22|9.05762               |0             |
+|19                      |58635.54|13.386449999999998    |0             |
+|18                      |28436.7 |10.94238              |0             |
+|25                      |61745.61|18.28875              |0             |
+|22                      |32585.08|20.1773               |0             |
+|21                      |25524.26|31.21083              |0             |
+|24                      |33161.95|17.97552              |0             |
+|30                      |12906.88|11.811900000000001    |0             |
+|21                      |6000.0  |6.62655               |0             |
++------------------------+--------+----------------------+--------------+
+only showing top 10 rows
+
+
+=== Write back to HDFS ===
+Output path: hdfs://namenode:8020/data/processed/financial_inclusion_features_hdfs

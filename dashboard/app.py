@@ -15,6 +15,12 @@ st.set_page_config(page_title="Financial Inclusion Analytics", layout="wide")
 st.title("Smart Financial Inclusion Analytics System")
 st.caption("Alternative Credit Scoring Dashboard")
 
+nav1, nav2 = st.columns(2)
+with nav1:
+    st.page_link("pages/1_DAG_and_HDFS.py", label="Open Spark DAG Page")
+with nav2:
+    st.link_button("Open HDFS Dashboard", "http://127.0.0.1:9870")
+
 left, right = st.columns([1, 1])
 
 with left:
