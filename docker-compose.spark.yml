@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  spark:
+    image: bitnami/spark:3.5.2
+    container_name: financial-inclusion-spark
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: ["bash", "-lc", "python data/pyspark_pipeline.py --input data/raw/financial_inclusion_data.csv --output data/processed/financial_inclusion_features.csv"]

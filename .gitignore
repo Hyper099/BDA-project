@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+logs/*.log
+models/artifacts/*.joblib
+storage/*.db
+data/processed/*.csv
+data/raw/financial_inclusion_data.csv
