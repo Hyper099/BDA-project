@@ -111,19 +111,19 @@ pip install -r requirements.txt
 ### Step 2: Generate synthetic data
 
 ```bash
-python data/generate_data.py --rows 5000 --seed 42
+python -m data.generate_data --rows 5000 --seed 42
 ```
 
 ### Step 3: Run PySpark ETL locally
 
 ```bash
-python data/pyspark_pipeline.py --input data/raw/financial_inclusion_data.csv --output data/processed/financial_inclusion_features.csv
+python -m data.pyspark_pipeline --input data/raw/financial_inclusion_data.csv --output data/processed/financial_inclusion_features.csv
 ```
 
 ### Step 4: Train models and save best model
 
 ```bash
-python models/train_model.py
+python -m models.train_model
 ```
 
 ### Step 5: Start FastAPI
@@ -182,6 +182,26 @@ Response includes:
 - `risk_category`
 - `probability_of_repayment`
 
+### Spark Runtime Trigger
+```http
+POST /spark/run
+Content-Type: application/json
+
+{
+  "persist_intermediate": true,
+  "keep_ui_alive_seconds": 30
+}
+```
+
+Starts an asynchronous PySpark pipeline job and returns a `job_id` plus Spark UI URL.
+
+### Spark Runtime Status
+```http
+GET /spark/status
+```
+
+Returns job lifecycle metadata (`idle/running/completed/failed`) and output locations.
+
 ## 9) Testing
 
 ### Quick API test with curl
@@ -215,3 +235,42 @@ python run_pipeline.py
 ```
 
 This executes generate -> ETL -> train.
+
+## 12) Spark UI Observability from Dashboard
+
+The Streamlit dashboard now includes a **Run Spark Pipeline** control and an **Open Spark UI** link.
+
+1. Start FastAPI:
+```bash
+uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+```
+2. Start Streamlit:
+```bash
+streamlit run dashboard/app.py
+```
+3. In the dashboard, click **Run Spark Pipeline**.
+4. Open **http://localhost:4040/jobs** while the job is running to inspect DAG/stages.
+
+The runtime pipeline performs multiple transformations and actions (`count`, `show`, output `write`) so Spark UI displays a non-trivial job graph.
+
+## 13) One File to Run Everything (Windows)
+
+Use the PowerShell launcher:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\start_project.ps1
+```
+
+This single command will:
+- start HDFS + Spark containers (`docker-compose.spark-hdfs.yml`)
+- upload raw data to HDFS
+- run a PySpark Spark-submit job on the cluster
+- start FastAPI backend in a new terminal
+- start Streamlit frontend in a new terminal
+
+After startup:
+- Backend: `http://localhost:8000`
+- Frontend: `http://localhost:8501`
+- HDFS UI: `http://localhost:9870`
+- Spark Master UI: `http://localhost:8080`
+- Local Spark Jobs UI: `http://localhost:4040/jobs` (only appears while `/spark/run` local job is active)

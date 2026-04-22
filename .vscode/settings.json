@@ -1,0 +1,19 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/.venv": true,
+    "**/__pycache__": true,
+    "logs/": true,
+    "data/processed/": true,
+    "data/warehouse/": true,
+    "models/artifacts/": true,
+    "storage/": true
+  },
+  "search.exclude": {
+    "data/processed/**": true,
+    "data/warehouse/**": true,
+    "models/artifacts/**": true,
+    "logs/**": true,
+    "storage/**": true
+  }
+}

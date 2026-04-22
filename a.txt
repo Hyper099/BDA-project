@@ -1,0 +1,4 @@
+Spark Jobs:http://localhost:4040/jobs (visible when local Spark session runs via API trigger)
+
+Cannot create file/data/raw/financial_inclusion_data.csv._COPYING_. Name node is in safe mode.
+

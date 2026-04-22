@@ -1,10 +1,13 @@
 """FastAPI service for risk scoring."""
 from __future__ import annotations
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
-from api.schemas import PredictionRequest, PredictionResponse
+from api.schemas import (PredictionRequest, PredictionResponse,
+                         SparkRunRequest, SparkRunResponse,
+                         SparkStatusResponse)
 from models.predict import CreditScoringService
+from spark_jobs.runtime import get_spark_job_status, start_spark_job
 from utils.db import init_db, log_prediction
 from utils.logger import get_logger
 
@@ -40,3 +43,25 @@ def predict(request: PredictionRequest) -> PredictionResponse:
     log_prediction(payload, result)
     logger.info("Prediction completed with risk category: %s", result["risk_category"])
     return PredictionResponse(**result)
+
+
+@app.post("/spark/run", response_model=SparkRunResponse)
+def run_spark_pipeline(request: SparkRunRequest | None = None) -> SparkRunResponse:
+    request = request or SparkRunRequest()
+    try:
+        payload = start_spark_job(
+            persist_intermediate=request.persist_intermediate,
+            keep_ui_alive_seconds=request.keep_ui_alive_seconds,
+        )
+        logger.info("Spark pipeline job started: %s", payload["job_id"])
+        return SparkRunResponse(**payload)
+    except RuntimeError as ex:
+        raise HTTPException(status_code=409, detail=str(ex)) from ex
+    except Exception as ex:  # noqa: BLE001
+        logger.exception("Failed to start Spark pipeline")
+        raise HTTPException(status_code=500, detail=f"Unable to start Spark pipeline: {ex}") from ex
+
+
+@app.get("/spark/status", response_model=SparkStatusResponse)
+def spark_status() -> SparkStatusResponse:
+    return SparkStatusResponse(**get_spark_job_status())

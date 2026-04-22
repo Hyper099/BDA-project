@@ -36,6 +36,9 @@ def generate_dataset(num_rows: int = 5000, seed: int = 42) -> pd.DataFrame:
 
     age = np.random.randint(18, 61, size=num_rows)
     location_type = np.random.choice(["urban", "rural"], size=num_rows, p=[0.55, 0.45])
+    urban_mask = location_type == "urban"
+    rural_mask = ~urban_mask
+
     income = _bounded_normal(num_rows, mean=42000, std=18000, low=6000, high=150000)
     occupation = np.random.choice(OCCUPATIONS, size=num_rows)
 
@@ -48,7 +51,55 @@ def generate_dataset(num_rows: int = 5000, seed: int = 42) -> pd.DataFrame:
     spending_ratio = _bounded_normal(num_rows, mean=0.68, std=0.18, low=0.1, high=1.25)
     payment_delay_days = np.maximum(0, np.random.normal(loc=8, scale=7, size=num_rows)).astype(int)
 
-    urban_boost = (location_type == "urban").astype(float) * 0.15
+    # Create visible urban/rural separation so portfolio comparisons are educational.
+    monthly_upi_transactions = np.clip(
+        monthly_upi_transactions + np.where(urban_mask, 4, -4),
+        0,
+        None,
+    ).astype(int)
+
+    mobile_recharge_frequency = np.clip(
+        mobile_recharge_frequency + np.where(urban_mask, 1, -1),
+        1,
+        20,
+    ).astype(int)
+
+    income = np.clip(
+        income * np.where(urban_mask, 1.08, 0.82),
+        6000,
+        150000,
+    )
+
+    avg_transaction_amount = np.clip(
+        avg_transaction_amount + np.where(urban_mask, -70.0, 140.0),
+        50,
+        8000,
+    )
+
+    bill_payment_timeliness = np.clip(
+        bill_payment_timeliness + np.where(urban_mask, 0.04, -0.09),
+        0.05,
+        1.0,
+    )
+
+    savings_ratio = np.clip(
+        savings_ratio + np.where(urban_mask, 0.03, -0.06),
+        0.01,
+        0.85,
+    )
+
+    spending_ratio = np.clip(
+        spending_ratio + np.where(urban_mask, -0.04, 0.09),
+        0.1,
+        1.25,
+    )
+
+    payment_delay_days = np.maximum(
+        0,
+        payment_delay_days + np.where(urban_mask, -1, 3),
+    ).astype(int)
+
+    location_adjustment = np.where(urban_mask, 0.22, -0.18)
     stable_jobs = np.isin(occupation, ["teacher", "nurse", "small_business"]).astype(float) * 0.2
 
     # Alternative data-driven repayment probability.
@@ -59,7 +110,7 @@ def generate_dataset(num_rows: int = 5000, seed: int = 42) -> pd.DataFrame:
         + 1.1 * savings_ratio
         - 0.85 * spending_ratio
         - 0.04 * payment_delay_days
-        + urban_boost
+        + location_adjustment
         + stable_jobs
         - 0.00009 * avg_transaction_amount
     )

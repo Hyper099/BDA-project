@@ -2,28 +2,68 @@
 from __future__ import annotations
 
 import json
+import sys
+from pathlib import Path
 
 import pandas as pd
 import requests
 import streamlit as st
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from dashboard.components.spark_panel import render_spark_panel
 from utils.config import METRICS_PATH, PROCESSED_DATA_PATH
 
 API_URL = "http://127.0.0.1:8000/predict"
 
 st.set_page_config(page_title="Financial Inclusion Analytics", layout="wide")
-st.title("Smart Financial Inclusion Analytics System")
-st.caption("Alternative Credit Scoring Dashboard")
+st.markdown(
+        """
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
+            html, body, [class*="css"]  {
+                font-family: 'Manrope', sans-serif;
+            }
+            .top-card {
+                border: 1px solid #d9e2ec;
+                border-radius: 16px;
+                padding: 1rem 1.25rem;
+                background: linear-gradient(145deg, #f7fbff, #ffffff);
+            }
+            .section-card {
+                border: 1px solid #e8eef5;
+                border-radius: 14px;
+                padding: 1rem;
+                background: #ffffff;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+)
 
-nav1, nav2 = st.columns(2)
+st.markdown('<div class="top-card">', unsafe_allow_html=True)
+st.title("Smart Financial Inclusion Analytics")
+st.caption("Alternative credit scoring with live Spark pipeline observability")
+st.markdown('</div>', unsafe_allow_html=True)
+
+nav1, nav2, nav3 = st.columns(3)
 with nav1:
     st.page_link("pages/1_DAG_and_HDFS.py", label="Open Spark DAG Page")
 with nav2:
     st.link_button("Open HDFS Dashboard", "http://127.0.0.1:9870")
+with nav3:
+    st.link_button("Open Spark Cluster UI", "http://localhost:8080")
 
-left, right = st.columns([1, 1])
+st.markdown("<div class=\"section-card\">", unsafe_allow_html=True)
+render_spark_panel()
+st.markdown("</div>", unsafe_allow_html=True)
+
+left, right = st.columns([1, 1], gap="large")
 
 with left:
+    st.markdown("<div class=\"section-card\">", unsafe_allow_html=True)
     st.subheader("Single User Scoring")
     monthly_upi_transactions = st.number_input("Monthly UPI Transactions", min_value=0, value=12)
     avg_transaction_amount = st.number_input("Average Transaction Amount", min_value=0.0, value=900.0)
@@ -65,8 +105,10 @@ with left:
             st.write(f"Repayment Probability: {result['probability_of_repayment']}")
         except Exception as ex:
             st.error(f"API call failed: {ex}")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 with right:
+    st.markdown("<div class=\"section-card\">", unsafe_allow_html=True)
     st.subheader("Batch Upload Scoring")
     uploaded_file = st.file_uploader("Upload CSV for scoring", type=["csv"])
     if uploaded_file:
@@ -92,6 +134,7 @@ with right:
                 file_name="scored_customers.csv",
                 mime="text/csv",
             )
+    st.markdown("</div>", unsafe_allow_html=True)
 
 st.subheader("Portfolio Insights")
 

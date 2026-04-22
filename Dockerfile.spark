@@ -1,0 +1,7 @@
+FROM apache/spark:3.5.3
+
+USER root
+
+RUN python3 -m pip install --no-cache-dir pyspark==3.5.3
+
+WORKDIR /app
